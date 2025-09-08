@@ -11,7 +11,10 @@
 
     - name: Show service status
       ansible.builtin.debug:
-        msg: "Service '{{ service_info.services[0].name }}' state: {{ service_info.services[0].state }}"
+        msg:
+          - "Service '{{ service_info.services[0].name }}'"
+          - "State: {{ service_info.services[0].state }}"
+          - "Username: {{ service_info.services[0].username }}"
       when: service_info.services | length > 0
 
     - name: Stop the specified service
@@ -26,7 +29,10 @@
 
     - name: Show service status again
       ansible.builtin.debug:
-        msg: "Service '{{ service_info.services[0].name }}' state: {{ service_info.services[0].state }}"
+        msg:
+          - "Service '{{ service_info.services[0].name }}'"
+          - "State: {{ service_info.services[0].state }}"
+          - "Username: {{ service_info.services[0].username }}"
       when: service_info.services | length > 0
 
     - name: Start the specified service
@@ -41,7 +47,10 @@
 
     - name: Show service status yet again
       ansible.builtin.debug:
-        msg: "Service '{{ service_info.services[0].name }}' state: {{ service_info.services[0].state }}"
+        msg:
+          - "Service '{{ service_info.services[0].name }}'"
+          - "State: {{ service_info.services[0].state }}"
+          - "Username: {{ service_info.services[0].username }}"
       when: service_info.services | length > 0
 
 ...
