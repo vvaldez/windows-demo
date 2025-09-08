@@ -29,4 +29,19 @@
         msg: "Service '{{ service_info.services[0].name }}' state: {{ service_info.services[0].state }}"
       when: service_info.services | length > 0
 
+    - name: Start the specified service
+      ansible.windows.win_service:
+        name: "{{ demo_win_service }}"
+        state: started
+
+    - name: Get service status yet again
+      ansible.windows.win_service_info:
+        name: "{{ demo_win_service }}"
+      register: service_info
+
+    - name: Show service status yet again
+      ansible.builtin.debug:
+        msg: "Service '{{ service_info.services[0].name }}' state: {{ service_info.services[0].state }}"
+      when: service_info.services | length > 0
+
 ...
