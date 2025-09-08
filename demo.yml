@@ -1,10 +1,12 @@
 - name: Demo stopping a Windows service
   hosts: all
   gather_facts: false
+  vars:
+    demo_win_service: "Spooler"
   tasks:
     - name: Get service status
       ansible.windows.win_service_info:
-        name: Spooler
+        name: "{{ demo_win_service }}"
       register: service_info
 
     - name: Show service status
@@ -12,14 +14,14 @@
         msg: "Service '{{ service_info.services[0].name }}' state: {{ service_info.services[0].state }}"
       when: service_info.services | length > 0
 
-    - name: Stop the Print Spooler service
+    - name: Stop the specified service
       ansible.windows.win_service:
-        name: Spooler
+        name: "{{ demo_win_service }}"
         state: stopped
 
     - name: Get service status again
       ansible.windows.win_service_info:
-        name: Spooler
+        name: "{{ demo_win_service }}"
       register: service_info
 
     - name: Show service status again
