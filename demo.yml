@@ -69,7 +69,7 @@
         filtered_and_mapped_services: >-
           {%- set results = [] -%}
           {%- for service in service_info.services -%}
-            {%- if service.username is defined
+            {%- if service.username
                 and service.username | lower != 'localsystem'
                 and not (service.username | lower).startswith('nt authority') -%}
               {%- set _ = results.append({
