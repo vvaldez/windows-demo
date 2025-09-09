@@ -57,6 +57,10 @@
       ansible.windows.win_service_info:
       register: service_info
 
+    - name: Debug all services
+      ansible.builtin.debug:
+        var: service_info
+
     - name: Mimic powershell search for services "Get-CIMInstance -Class Win32_Service -filter "StartName != 'LocalSystem' AND NOT StartName LIKE 'NT Authority%' " | Select-Object SystemName, Name, Caption, StartMode, StartName, State | Sort-Object StartName"
       ansible.builtin.set_fact:
         custom_services_list: "{{ filtered_and_mapped_services | sort(attribute='StartName') }}"
