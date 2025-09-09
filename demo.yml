@@ -63,8 +63,8 @@
           {{
             service_info.services
             | selectattr('username', 'defined')
-            | reject('match', '^LocalSystem$', attribute='username', case_sensitive=False)
-            | reject('match', '^NT Authority', attribute='username', case_sensitive=False)
+            | rejectattr('match', '^LocalSystem$', attribute='username', case_sensitive=False)
+            | rejectattr('match', '^NT Authority', attribute='username', case_sensitive=False)
             | map('community.general.dict_kv', {
                 'SystemName': 'machine_name',
                 'Name': 'name',
