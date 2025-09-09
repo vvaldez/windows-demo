@@ -53,4 +53,33 @@
           - "Username: {{ service_info.services[0].username }}"
       when: service_info.services | length > 0
 
+    - name: Get all services
+      ansible.windows.win_service_info:
+      register: all_services_info
+
+    - name: Mimic powershell search for services "Get-CIMInstance -Class Win32_Service -filter "StartName != 'LocalSystem' AND NOT StartName LIKE 'NT Authority%' " | Select-Object SystemName, Name, Caption, StartMode, StartName, State | Sort-Object StartName"
+      ansible.builtin.set_fact:
+        custom_services_list: >-
+          {{
+            all_services_info
+            | community.general.json_query(jmespath_query)
+            | sort(attribute='StartName')
+          }}
+      vars:
+        jmespath_query: >-
+          services
+          [?username && username != 'LocalSystem' && !starts_with(username, 'NT Authority')]
+          .{
+            SystemName: machine_name,
+            Name: name,
+            Caption: display_name,
+            StartMode: start_mode,
+            StartName: username,
+            State: state
+          }
+
+    - name: 3. Display the final list
+      ansible.builtin.debug:
+        var: custom_services_list
+
 ...
