@@ -61,10 +61,7 @@
       ansible.builtin.set_fact:
         custom_services_list: >-
           {{
-            service_info.services
-            | selectattr('username', 'defined')
-            | rejectattr('match', '^LocalSystem$', attribute='username', case_sensitive=False)
-            | rejectattr('match', '^NT Authority', attribute='username', case_sensitive=False)
+            filtered_services
             | map('community.general.dict_kv', {
                 'SystemName': 'machine_name',
                 'Name': 'name',
@@ -75,6 +72,18 @@
               })
             | sort(attribute='StartName')
           }}
+      vars:
+        # This block uses a Jinja2 for-loop to reliably filter the list
+        filtered_services: >-
+          {%- set results = [] -%}
+          {%- for service in service_info.services -%}
+            {%- if service.username is defined
+                and service.username | lower != 'localsystem'
+                and not (service.username | lower).startswith('nt authority') -%}
+              {%- set _ = results.append(service) -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {{ results }}
 
     - name: Display the custom list
       ansible.builtin.debug:
