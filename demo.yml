@@ -61,7 +61,7 @@
       ansible.builtin.set_fact:
         custom_services_list: "{{ filtered_and_mapped_services | sort(attribute='StartName') }}"
       vars:
-        # This block now filters AND maps the data in a single loop
+        # This block now filters and maps the data in a single loop
         filtered_and_mapped_services: >-
           {%- set results = [] -%}
           {%- for service in service_info.services -%}
@@ -69,7 +69,7 @@
                 and service.username | lower != 'localsystem'
                 and not (service.username | lower).startswith('nt authority') -%}
               {%- set _ = results.append({
-                  'SystemName': service.machine_name,
+                  'SystemName': inventory_hostname,
                   'Name': service.name,
                   'Caption': service.display_name,
                   'StartMode': service.start_mode,
