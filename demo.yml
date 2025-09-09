@@ -59,28 +59,23 @@
 
     - name: Mimic powershell search for services "Get-CIMInstance -Class Win32_Service -filter "StartName != 'LocalSystem' AND NOT StartName LIKE 'NT Authority%' " | Select-Object SystemName, Name, Caption, StartMode, StartName, State | Sort-Object StartName"
       ansible.builtin.set_fact:
-        custom_services_list: >-
-          {{
-            filtered_services
-            | map('community.general.dict_kv', {
-                'SystemName': 'machine_name',
-                'Name': 'name',
-                'Caption': 'display_name',
-                'StartMode': 'start_mode',
-                'StartName': 'username',
-                'State': 'state'
-              })
-            | sort(attribute='StartName')
-          }}
+        custom_services_list: "{{ filtered_and_mapped_services | sort(attribute='StartName') }}"
       vars:
-        # This block uses a Jinja2 for-loop to reliably filter the list
-        filtered_services: >-
+        # This block now filters AND maps the data in a single loop
+        filtered_and_mapped_services: >-
           {%- set results = [] -%}
           {%- for service in service_info.services -%}
             {%- if service.username is defined
                 and service.username | lower != 'localsystem'
                 and not (service.username | lower).startswith('nt authority') -%}
-              {%- set _ = results.append(service) -%}
+              {%- set _ = results.append({
+                  'SystemName': service.machine_name,
+                  'Name': service.name,
+                  'Caption': service.display_name,
+                  'StartMode': service.start_mode,
+                  'StartName': service.username,
+                  'State': service.state
+                }) -%}
             {%- endif -%}
           {%- endfor -%}
           {{ results }}
